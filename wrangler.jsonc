@@ -20,14 +20,14 @@
 	},
 	/**
 	 * D1 database for users and sessions.
-	 * `database_id` is a placeholder: local development and `--local` migrations work without
-	 * a real database. Before deploying, run `npx wrangler d1 create quizmaker-db` and replace it.
+	 * `npm run db:migrate` and `npm run db:seed` act on a local copy; the `database_id` below is
+	 * the real database, so any command with `--remote` reaches production data.
 	 */
 	"d1_databases": [
 		{
 			"binding": "DB",
 			"database_name": "quizmaker-db",
-			"database_id": "00000000-0000-0000-0000-000000000000",
+			"database_id": "94354c83-1ddb-402d-8e67-fd6099e57478",
 			"migrations_dir": "migrations"
 		}
 	]
