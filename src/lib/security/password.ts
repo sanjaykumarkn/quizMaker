@@ -8,7 +8,12 @@
 
 const ALGORITHM = "pbkdf2";
 const DIGEST = "sha256";
-const ITERATIONS = 210_000;
+/**
+ * The Workers runtime rejects PBKDF2 above 100k iterations, so this is a hard ceiling rather
+ * than a tuning choice. Node has no such limit, which is why `next dev` accepts a higher value
+ * and only the deployed Worker fails. Below current OWASP guidance; see the PRD.
+ */
+const ITERATIONS = 100_000;
 const SALT_BYTES = 16;
 const KEY_BITS = 256;
 

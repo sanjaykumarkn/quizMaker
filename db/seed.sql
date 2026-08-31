@@ -17,6 +17,6 @@ VALUES (
   'Admin',
   'admin',
   'admin@example.com',
-  'pbkdf2$sha256$210000$YBsXDJFHjDEofhzSsAn4Hg==$iUOVFCJf15QofVmaq/PWlqhxh4jGp/xLqXkTELKw+Lo=',
+  'pbkdf2$sha256$100000$hFBEsEF6K7+lYKJIyizXmQ==$XpyAp3eCbAaOcpZbVnTXU/rbtlw/uwVt3DgJm2lS5cc=',
   'admin'
 );

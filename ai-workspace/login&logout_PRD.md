@@ -155,14 +155,21 @@ database leak does not hand an attacker usable sessions.
 without breaking existing rows:
 
 ```
-pbkdf2$sha256$210000$<base64 salt>$<base64 derived key>
+pbkdf2$sha256$100000$<base64 salt>$<base64 derived key>
 ```
 
-- 16-byte random salt per user, 32-byte derived key, 210,000 iterations
+- 16-byte random salt per user, 32-byte derived key, 100,000 iterations
 - Verification re-derives with the stored salt and iteration count, then compares in constant
   time
 - Plain-text passwords exist only as a local variable inside the service layer and are never
   logged, returned, or written to the database
+
+**The iteration count is capped by the platform, not chosen.** The Workers runtime rejects
+PBKDF2 above 100,000 iterations with `NotSupportedError`, so 100,000 is the ceiling. This is
+below current OWASP guidance for PBKDF2-SHA256, which is the main residual weakness in this
+design. Raising it requires either a different KDF or chaining several derivations, neither of
+which is implemented. Because verification reads the iteration count from the stored string,
+rows written at a different count stay verifiable as long as that count is also under the cap.
 
 ### API Endpoints
 
@@ -727,6 +734,22 @@ lowercase with dashes only`.
 **Problem**: "Wrong number of parameter bindings" from a query that looks correct.
 **Cause**: Mixing anonymous `?` and numbered `?1` placeholders in one statement.
 **Solution**: Use numbered placeholders exclusively.
+
+### Every login fails on the deployed Worker but works with `npm run dev`
+
+**Problem**: The deployed app answers "Invalid username or password." for known-good
+credentials, and registration returns 500, while the same credentials work locally.
+**Cause**: PBKDF2 iterations above 100,000. The Workers runtime throws
+`NotSupportedError: Pbkdf2 failed: iteration counts above 100000 are not supported`. In
+`hashPassword` that surfaces as a 500; in `verifyPassword` the `catch` turns it into `false`,
+which is indistinguishable from a wrong password. Node has no such cap, so `npm run dev`
+cannot reproduce it.
+**Solution**: Keep `ITERATIONS` at or below 100,000 in both `src/lib/security/password.ts` and
+`scripts/hash-password.mjs`, then re-hash any rows written at a higher count.
+**How it was found**: `npx wrangler tail quizmaker --format json` showed the real exception. A
+swallowed error in a verification path is invisible from the outside, so check the logs before
+suspecting the data.
+**Code Reference**: `src/lib/security/password.ts`
 
 ---
 
