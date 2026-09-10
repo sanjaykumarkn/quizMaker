@@ -5,27 +5,45 @@ agent conversation, so it describes only what is stable and true of the project.
 
 ## Project
 
-<!--
-Replace this section during Sprint 1 with a short description of what you are building:
-the problem, the primary user, and the current state. Two or three sentences.
-Keep it current. An out-of-date description here misleads every future conversation.
--->
+quizMaker is a quiz-authoring application. An administrator writes multiple choice
+questions and anyone signed in can answer them, with each answer recorded as correct or
+incorrect. Two modules are built and verified: authentication with user management
+(`/login`, `/signup`, `/users`, `/account`), and multiple choice questions with attempts
+(`/mcq`). Signing in lands on `/mcq`.
 
-This is an unmodified AISprints starter. No application features have been built yet.
-The technical PRD in `ai-workspace/` is the source of truth for what is being built and
-for the current phase of work.
+Nothing groups questions into a quiz yet — `mcqs` is a flat list. The technical PRDs in
+`ai-workspace/` are the source of truth for what is being built and for the current phase
+of work; read the one matching the area you are changing before changing it.
 
 ## Stack
 
 - **Next.js 16** with the App Router and React 19
 - **Cloudflare Workers** for hosting, via `@opennextjs/cloudflare`
+- **Cloudflare D1** for storage, bound as `DB`, with migrations in `migrations/`
 - **Tailwind CSS v4**, configured in CSS rather than a JS config file
 - **shadcn/ui** on Base UI, `base-nova` style, with Lucide icons
+- **Zod** for validation, applied in the service layer
+- **Vitest** with Testing Library and jsdom for tests, configured in `vitest.config.mts`
 - **TypeScript** in strict mode
 - **Wrangler** for Cloudflare configuration, secrets, and deployment
 
-No database, authentication, testing framework, or AI SDK is installed yet. Do not
-write code that imports one without adding it first and telling the user.
+No AI SDK is installed. Do not write code that imports one without adding it first and
+telling the user.
+
+### Layering
+
+Strict, and the same in both modules. Each layer may only call the layer directly beneath
+it. A route handler or page that issues SQL is a bug.
+
+```
+Presentation / API   src/app/**              Pages, Server Actions, route handlers
+Service              src/lib/services/       Validation and all business rules
+Repository           src/lib/repositories/   Prepared D1 statements, row mapping
+Database             Cloudflare D1
+```
+
+`src/lib/db/client.ts` is imported only by repositories. D1 is server-only, so no
+repository or service may be imported from a `'use client'` file.
 
 ## Layout
 
@@ -49,11 +67,18 @@ Import through the `@/` alias, which maps to `src/`.
 | `npm run preview` | Build and run on the local **Workers** runtime |
 | `npm run build` | Production build |
 | `npm run lint` | ESLint |
+| `npm test` | Vitest, once |
+| `npm run test:watch` | Vitest in watch mode |
+| `npm run db:migrate` | Apply migrations to the **local** D1 instance |
+| `npm run db:seed` | Seed the bootstrap admin (`admin` / `Password123!`) |
 | `npm run deploy` | Build and deploy to Cloudflare |
 | `npm run cf-typegen` | Regenerate `cloudflare-env.d.ts` after changing bindings |
 
 `npm run dev` runs on Node and will not surface Workers-specific problems. Verify
 anything runtime-sensitive with `npm run preview`.
+
+Restart the dev server after any `wrangler.jsonc` change; bindings are read at startup.
+Stop it before `npm run build`, since both write to `.next`.
 
 ## Working agreements
 
@@ -66,8 +91,10 @@ anything runtime-sensitive with `npm run preview`.
 - **Keep secrets out of the repo.** Local values belong in `.dev.vars`, which is
   gitignored. When adding a variable, also add an empty placeholder to
   `.dev.vars.example`. Production values go in `wrangler secret put`.
-- **Verify before claiming completion.** Run `npm run lint` and `npm run build` and
-  report the actual result. Do not describe work as done based on inspection alone.
+- **Verify before claiming completion.** Run `npm test`, `npm run lint` and `npm run build`
+  and report the actual result. Do not describe work as done based on inspection alone.
+- **Validate every input with Zod in the service layer.** Both existing modules do, and it
+  is the only thing enforcing rules the database cannot express.
 - **Say when you are unsure.** A flagged uncertainty is more useful than a confident
   guess that has to be unwound later.
 
