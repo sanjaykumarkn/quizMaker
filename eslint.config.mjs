@@ -9,6 +9,9 @@ const eslintConfig = [
 			"node_modules/**",
 			".next/**",
 			".open-next/**",
+			// `wrangler deploy` leaves generated worker bundles here, which otherwise drown
+			// real findings in thousands of warnings from third-party code.
+			".wrangler/**",
 			"out/**",
 			"build/**",
 			"next-env.d.ts",
