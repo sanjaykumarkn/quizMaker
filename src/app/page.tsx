@@ -5,5 +5,5 @@ import { getCurrentUser } from "@/lib/auth/session";
 
 export default async function Home() {
 	const user = await getCurrentUser();
-	redirect(user ? landingPathFor(user) : "/login");
+	redirect(user ? landingPathFor() : "/login");
 }

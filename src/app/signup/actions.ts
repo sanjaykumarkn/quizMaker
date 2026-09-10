@@ -41,5 +41,5 @@ export async function signupAction(
 
 	// Outside the catch: `redirect` signals by throwing and must not be swallowed above.
 	await setSessionCookie(session.token, session.expiresAt);
-	redirect(landingPathFor(session.user));
+	redirect(landingPathFor());
 }

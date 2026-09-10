@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 export default async function SignupPage() {
 	const currentUser = await getCurrentUser();
 	if (currentUser) {
-		redirect(landingPathFor(currentUser));
+		redirect(landingPathFor());
 	}
 
 	return (

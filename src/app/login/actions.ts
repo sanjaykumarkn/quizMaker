@@ -41,7 +41,7 @@ export async function loginAction(
 
 	// Outside the catch: `redirect` signals by throwing, so it must not be swallowed above.
 	await setSessionCookie(session.token, session.expiresAt);
-	redirect(landingPathFor(session.user));
+	redirect(landingPathFor());
 }
 
 export async function logoutAction(): Promise<void> {
