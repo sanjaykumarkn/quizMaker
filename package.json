@@ -7,6 +7,8 @@
 		"build": "next build",
 		"start": "next start",
 		"lint": "eslint .",
+		"test": "vitest run",
+		"test:watch": "vitest",
 		"deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
 		"upload": "opennextjs-cloudflare build && opennextjs-cloudflare upload",
 		"preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
@@ -20,6 +22,7 @@
 		"@opennextjs/cloudflare": "^1.20.2",
 		"class-variance-authority": "^0.7.1",
 		"clsx": "^2.1.1",
+		"cn": "^0.2.6",
 		"lucide-react": "^1.28.0",
 		"next": "16.2.12",
 		"react": "19.2.8",
@@ -30,14 +33,18 @@
 	},
 	"devDependencies": {
 		"@tailwindcss/postcss": "^4",
+		"@testing-library/react": "^16.3.3",
+		"@testing-library/user-event": "^14.6.7",
 		"@types/node": "^22.19.0",
 		"@types/react": "^19",
 		"@types/react-dom": "^19",
 		"eslint": "^9",
 		"eslint-config-next": "16.2.12",
+		"jsdom": "^30.0.1",
 		"shadcn": "^4.16.1",
 		"tailwindcss": "^4",
 		"typescript": "^5",
+		"vitest": "^5.0.0",
 		"wrangler": "^4.118.0"
 	}
 }
